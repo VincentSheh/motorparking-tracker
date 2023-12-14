@@ -1,6 +1,8 @@
 from peewee import Model, PostgresqlDatabase, CharField, UUIDField, IntegerField, SQL
 import uuid
 import ast
+from peewee import DoesNotExist
+
 db = PostgresqlDatabase('parking-tracker', user='postgres', password='postgres', host='localhost', port=5432)
 
 class Parkings(Model):
@@ -32,9 +34,12 @@ def create_or_get_parking(display_id: uuid.UUID, latitude: str = None, longitude
     return parking
   
 def get_polygons(display_id: uuid.UUID):
+  try:
     parking = Parkings.get(Parkings.display_id == display_id)
     str_polygon_axes = parking.polygon_axes
     if str_polygon_axes != None:
       polygons_axes = ast.literal_eval(parking.polygon_axes)
       return polygons_axes
+    return []
+  except DoesNotExist:
     return []

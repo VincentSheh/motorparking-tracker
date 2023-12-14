@@ -77,7 +77,7 @@ while True:
             client_socket.send(msg.encode())
         elif json_msg == 'update_0':
             data_dict = {
-                'id':'000',
+                'id':'bc2bdfc4-3ba5-4282-90f1-fa5802defaec',
                 'currMotor':10
             }
             json_data = json.dumps(data_dict)
@@ -85,7 +85,7 @@ while True:
             client_socket.send(msg.encode())
         elif json_msg == 'update_1':
             data_dict = {
-                'id':'001',
+                'id':'03c5d93e-bd9d-4814-aa57-a0d46a6ad084',
                 'currMotor':5
             }
             json_data = json.dumps(data_dict)
