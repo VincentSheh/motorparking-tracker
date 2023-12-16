@@ -13,7 +13,6 @@ const Home = () => {
       </video>
       <div className="relative z-20 text-center text-white">
         <MotorparkingTrackerList />
-        <LatestImage folderPath="images" alt="Latest Image" />
         <div className="mt-8 flex items-center justify-center">
           <Button as={Link} href="/map" text="Try Now!" alt="Motorcycle" />
         </div>
