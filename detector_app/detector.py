@@ -80,7 +80,7 @@ def send_detection_count(parking_data, n_motor, exist):
         msg = ' '.join([socket_action, json_data])
         client_socket.send(msg.encode())
     except Exception as e:
-        print(f"Error sending data: {e}")
+        print(f"ERROR! sending data: {e}")
         
 def upload_to_cloud(parking_data, image, n_ill_motor):
     upload_firebase(parking_data['uuid'], image)
