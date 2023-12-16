@@ -63,12 +63,29 @@ export default function useMap() {
       // console.log(data)
       // setMapInfo(data);
     });
+    socket.on("create", (data:any)=>{
+      console.log("SOCKETTT", data)
+      const{id, latitude, longitude, currMotor} =data
+      setMapInfo((prev:any) =>({
+        ...prev,
+        [id]:{
+          latitude:latitude,
+          longitude:longitude,
+          currMotor:currMotor,
+        }
+      }))
+    })
+
+    
     socket.on("update", (data: any) => {
       const { id, currMotor } = data;
-      setMapInfo((prev) => ({
+      setMapInfo((prev:any) =>({
         ...prev,
-        ...(prev[id]["currMotor"] = currMotor),
-      }));
+        [id]:{
+          ...prev[id],
+          currMotor:currMotor
+        }
+      }))
     });
   }, []);
   return { mapInfo, markerToggle, setMarkerToggle, setMapInfo };

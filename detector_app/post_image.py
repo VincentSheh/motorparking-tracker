@@ -18,13 +18,15 @@ def get_rpi_uuid():
                     return serial
     except IOError:
         return "Error: Unable to open the file."
-def get_location():
+def get_location(): #TODO: CHANGE RPi Location
     response = requests.get('http://ipinfo.io/json')
     data = response.json()
 
     location = data.get('loc', None)
+    
     if location:
         latitude, longitude = location.split(',')
+        latitude, longitude = 25.03582739518955, 121.51698905293016
         return latitude, longitude
 
 
@@ -32,7 +34,7 @@ class RPi_client():
   def __init__(self):
     self.state = 'Registering'
     #TODO: CHANGE UUID
-    self.uuid = '03c5d93e-bd9d-4814-aa57-a0d46a6ad084'
+    self.uuid = '52c5f4c9-332c-4e11-8dcc-4b9b6a56224d'
     # self.uuid = str(uuid.uuid4()) 
     # self.uuid = str(get_rpi_uuid())
     # TODO: GET GPS MODULE
@@ -42,28 +44,29 @@ class RPi_client():
     self.curr_motor = 0
     
   
-  def crop_img(self, img):
-    polygon_points = [(2289, 657), (2254, 828), (2341, 998), (2491, 1059), (2619, 980), (2615, 660), (2322, 654)] #Replace with points obtained from get_lasso_points.py
-    pts = np.array(polygon_points, np.int32)
-    pts = pts.reshape((-1, 1, 2))
+  # def crop_img(self, img):
+  #   polygon_points = [(2289, 657), (2254, 828), (2341, 998), (2491, 1059), (2619, 980), (2615, 660), (2322, 654)] #Replace with points obtained from get_lasso_points.py
+  #   polygon_points
+  #   pts = np.array(polygon_points, np.int32)
+  #   pts = pts.reshape((-1, 1, 2))
 
-    mask = np.zeros_like(img) #Create a black image with similar shape as original
+  #   mask = np.zeros_like(img) #Create a black image with similar shape as original
 
-    cv2.fillPoly(mask, [pts], (255, 255, 255)) #Insert the polygon and fill it with white
+  #   cv2.fillPoly(mask, [pts], (255, 255, 255)) #Insert the polygon and fill it with white
     
-    result = cv2.bitwise_and(img, mask) #Perform intersection of the masked image and the original
+  #   result = cv2.bitwise_and(img, mask) #Perform intersection of the masked image and the original
 
-    return img #TODO: REPLACE WITH RESULT
+  #   return img #TODO: REPLACE WITH RESULT
 
 
   #Capture the image and perform preprocessing such as cropping
   def rpi_capture_img(self):
     with picamera.PiCamera() as camera:
-        camera.resolution = (320, 240) #TODO: Replace Resolution
+        camera.resolution = (640, 480) #TODO: Replace Resolution
         camera.framerate = 24
-        image = np.empty((240 * 320 * 3,), dtype=np.uint8)
+        image = np.empty((480 * 320 * 3,), dtype=np.uint8)
         camera.capture(image, 'bgr')
-        img = image.reshape((240, 320, 3))
+        img = image.reshape((480, 640, 3))
     return img
         
   def test_capture_img(self, path='./sample_image.jpg'):
@@ -74,7 +77,7 @@ class RPi_client():
   def post_img(self, img, api = 'http://localhost:3001/detect'):
     
     #Crop the Image
-    img = self.crop_img(img)
+    # img = self.crop_img(img)
 
     #Convert to jpg format from numpy
     _, encoded_img = cv2.imencode('.jpg', img)
