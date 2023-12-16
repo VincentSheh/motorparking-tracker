@@ -25,11 +25,11 @@ export default function IllegalParkers() {
         <CardContent className="space-y-2">
           <div className="space-y-1">
             <Label htmlFor="current">Current password</Label>
-            <Input id="current" type="password" />
+            <Input id="current" type="password" className="border border-black" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="new">New password</Label>
-            <Input id="new" type="password" />
+            <Input id="new" type="password" className="border border-black"/>
           </div>
         </CardContent>
         <CardFooter>

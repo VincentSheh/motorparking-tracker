@@ -19,10 +19,12 @@ export default function AdminTabs() {
   return (
     <Tabs defaultValue="create" className="w-screen">
       <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="create">Add Parking Lot</TabsTrigger>
-        <TabsTrigger value="password">
-          See Illegally Parcked Vehicle
-        </TabsTrigger>
+        <div className="text-center border-r-2 py-1">
+          <TabsTrigger value="create">Add Parking Lot</TabsTrigger>
+        </div>
+        <div className="text-center border-r-2 py-1">
+          <TabsTrigger value="password">See Illegally Parked Vehicle</TabsTrigger>
+        </div>
         <TabsTrigger value="parkings">Parking Lists</TabsTrigger>
       </TabsList>
       <AddParking />

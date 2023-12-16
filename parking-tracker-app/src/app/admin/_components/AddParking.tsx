@@ -13,6 +13,7 @@ import { TabsContent } from "@/components/ui/tabs";
 
 export default function AddParking() {
   const addParking = () => {};
+
   return (
     <TabsContent value="create">
       <Card>
@@ -25,19 +26,39 @@ export default function AddParking() {
         <CardContent className="space-y-2">
           <div className="space-y-1">
             <Label htmlFor="name">Latitude</Label>
-            <Input id="name" placeholder="25.01370607644918" defaultValue="" />
+            <Input
+              id="name"
+              placeholder="25.01370607644918"
+              defaultValue=""
+              className="border border-black"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Longitude</Label>
-            <Input id="name" placeholder="121.53468199176018" defaultValue="" />
+            <Input
+              id="name"
+              placeholder="121.53468199176018"
+              defaultValue=""
+              className="border border-black"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="username">UUID</Label>
-            <Input id="username" placeholder="Device UUID" defaultValue="" />
+            <Input
+              id="username"
+              placeholder="Device UUID"
+              defaultValue=""
+              className="border border-black"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Available Slots</Label>
-            <Input id="name" placeholder="10" defaultValue="" />
+            <Input
+              id="name"
+              placeholder="10"
+              defaultValue=""
+              className="border border-black"
+            />
           </div>
         </CardContent>
         <CardFooter>
