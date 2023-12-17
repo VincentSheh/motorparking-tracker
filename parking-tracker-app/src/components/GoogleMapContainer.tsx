@@ -1,28 +1,27 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   GoogleMap,
   Marker,
   useLoadScript,
-  useGoogleMap,
   InfoWindow,
-  OverlayView
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
 import Image from "next/image";
 import { io } from "socket.io-client";
+import axios from "axios";
 
 interface Position {
   lat?: number | undefined;
   lng?: number | undefined;
 }
 const socketUrl: any = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
-//const socketPath: any = process.env.NEXT_PUBLIC_SOCKET_PATH;
 
 export default function GoogleMapContainer() {
   const { mapInfo, markerToggle, setMarkerToggle, setMapInfo } = useMap();
+  const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
-  /*
   useEffect(() => {
     const socket = io(socketUrl);
     socket.on("initialization", (data: any) => {
@@ -35,7 +34,7 @@ export default function GoogleMapContainer() {
         ...(prev[id]["currMotor"] = currMotor),
       }));
     });
-  }, []);*/
+  }, []);
 
   useEffect(() => {
     console.log(mapInfo);
@@ -49,27 +48,10 @@ export default function GoogleMapContainer() {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
-  const [mapRef, setMapRef] = useState();
   const [currLocation, setCurrLocation] = useState<Position>({
     lat: 0,
     lng: 0,
   });
-
-  const onMapLoad = (map: any) => {
-    setMapRef(map);
-  };
-
-  const handleMarkerClick = () => {
-    mapRef?.panTo(currLocation);
-  };
-
-  const toggleMarker = (id: string) => {
-    console.log(`run toggle marker for id:${id}`);
-    const tempMarkerToggle = markerToggle;
-    tempMarkerToggle[id] = tempMarkerToggle[id] ? false : true;
-    setMarkerToggle(tempMarkerToggle);
-    console.log(markerToggle);
-  };
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -90,6 +72,31 @@ export default function GoogleMapContainer() {
     fontSize: "28px",
   };
 
+  const handleMarkerClick = async (id: string | null) => {
+    setSelectedMarker(id);
+    if (id) {
+      try {
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${id}&fields=photo&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+        );
+        const photoReference =
+          response.data.result.photos?.[0]?.photo_reference;
+        if (photoReference) {
+          setPhotoUrl(
+            `https://maps.googleapis.com/maps/api/place/photo?photoreference=${photoReference}&sensor=false&maxheight=400&maxwidth=600&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+          );
+        } else {
+          setPhotoUrl(null);
+        }
+      } catch (error) {
+        console.error("Error fetching photo:", error);
+        setPhotoUrl(null);
+      }
+    } else {
+      setPhotoUrl(null);
+    }
+  };
+
   return (
     <div className="h-screen w-screen">
       {!isLoaded ? (
@@ -99,8 +106,6 @@ export default function GoogleMapContainer() {
           mapContainerClassName="h-full"
           center={currLocation}
           zoom={15}
-          onLoad={onMapLoad}
-          fullscreenControl={false}
         >
           <Marker
             key="user-location"
@@ -109,7 +114,7 @@ export default function GoogleMapContainer() {
               url: "/motor.png",
               scaledSize: new google.maps.Size(60, 60),
             }}
-            onClick={handleMarkerClick}
+            onClick={() => handleMarkerClick(null)}
           />
           {Object.keys(mapInfo).map((id) => (
             <Marker
@@ -125,21 +130,32 @@ export default function GoogleMapContainer() {
                     ? new google.maps.Size(60, 60)
                     : new google.maps.Size(40, 40),
               }}
-              onClick={() => toggleMarker(id)}
+              onClick={() => handleMarkerClick(id)}
               label={{
                 text: `Parking Space : ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`,
                 style: markerStyle,
               }}
             >
-              {/*markerToggle[id] && (
+              {selectedMarker === id && (
                 <InfoWindow
                   key={`info-window-${id}`}
                   position={mapInfo[id].position}
-                  onCloseClick={() => toggleMarker(id)}
+                  onCloseClick={() => handleMarkerClick(null)}
                 >
-                  <div>hi</div>
+                  <div>
+                    {photoUrl ? (
+                      <Image
+                        src={photoUrl}
+                        alt="Location Image"
+                        width={400}
+                        height={300}
+                      />
+                    ) : (
+                      <p>No photo available</p>
+                    )}
+                  </div>
                 </InfoWindow>
-              )*/}
+              )}
             </Marker>
           ))}
         </GoogleMap>
