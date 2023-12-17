@@ -8,7 +8,7 @@ const socketIo = require("socket.io");
 const net = require("net"); //For the raw socket TCP connections
 const regexPattern = /^(\S+)\s+(.*)$/;
 
-dotenv.config({ path: "./.env.local" }); //Make the env variable accessable
+dotenv.config({ path: "./.env" }); //Make the env variable accessable
 
 interface Position {
   lat?: number;
