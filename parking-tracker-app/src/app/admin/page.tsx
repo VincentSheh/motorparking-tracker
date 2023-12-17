@@ -1,13 +1,13 @@
 import AdminTabs from "./_components/AdminTabs";
 import LatestImage from "./_components/image";
+
 function AdminPage() {
   return (
-
-    <div className="w-full bg-blue-900 text-white">
-      <nav className="text-left px-2">
-        <h2 className="mb-4 text-3xl font-bold">Admin Page</h2>
-        <p>TODOs: set polygon axes value to the database</p>
-        <p>TODOs: Use opencv2 to draw and determine polygon axes</p>
+    <div className="w-full bg-orange-200 text-black">
+      <nav className="text-left px-2 bg-gray-200 h-16 pl-20">
+        <h2 className="text-3xl" style={{ fontFamily: 'cursive'}}>
+          Admin Page
+        </h2>
       </nav>
       <AdminTabs />
     </div>

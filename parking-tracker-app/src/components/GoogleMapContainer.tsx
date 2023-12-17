@@ -9,9 +9,8 @@ import {
   OverlayView
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
-import Image from "next/image";
 import { io } from "socket.io-client";
-
+import Image from "@/app/admin/_components/Imageformap";
 interface Position {
   lat?: number | undefined;
   lng?: number | undefined;
@@ -131,15 +130,21 @@ export default function GoogleMapContainer() {
                 style: markerStyle,
               }}
             >
-              {markerToggle[id]=true && (
-                <InfoWindow
-                  key={`info-window-${id}`}
-                  position={mapInfo[id].position}
-                  onCloseClick={() => toggleMarker(id)}
-                >
-                  <div>hi</div>
-                </InfoWindow>
-              )}
+            {markerToggle[id]=true && (
+              <InfoWindow
+                key={`info-window-${id}`}
+                position={mapInfo[id].position}
+                onCloseClick={() => toggleMarker(id)}
+              >
+                <div style={{ width: '300px', height: '300px' }}>
+                  <p>ID: {id}</p>
+                  <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
+                  <p>Current Motor: {mapInfo[id].currMotor}</p>
+                  <p>Max Space: {mapInfo[id].maxSpace}</p>
+                  <Image folderPath={id} alt={`Parking Space ${id}`} />
+                </div>
+              </InfoWindow>
+            )}
             </Marker>
           ))}
         </GoogleMap>
