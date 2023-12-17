@@ -1,4 +1,3 @@
-// Import necessary components and icons
 import React, { useState } from "react";
 import { Button, IconButton, Toolbar } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -25,7 +24,6 @@ const AdminSidebar = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Permanent Security Icon */}
       <div className="w-16 bg-gray-200">
       <IconButton
             size="large"
