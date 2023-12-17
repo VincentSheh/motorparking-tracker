@@ -6,11 +6,12 @@ import {
   useLoadScript,
   useGoogleMap,
   InfoWindow,
-  OverlayView
+  OverlayView,
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
 import Image from "next/image";
 import { io } from "socket.io-client";
+import Button from "./Button";
 
 interface Position {
   lat?: number | undefined;
@@ -72,6 +73,7 @@ export default function GoogleMapContainer() {
   };
 
   useEffect(() => {
+    console.log(mapInfo);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
@@ -91,47 +93,49 @@ export default function GoogleMapContainer() {
   };
 
   return (
-    <div className="h-screen w-screen">
+    <div className="h-screen w-screen flex flex-row">
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
-        <GoogleMap
-          mapContainerClassName="h-full"
-          center={currLocation}
-          zoom={15}
-          onLoad={onMapLoad}
-          fullscreenControl={false}
-        >
-          <Marker
-            key="user-location"
-            position={currLocation}
-            icon={{
-              url: "/motor.png",
-              scaledSize: new google.maps.Size(60, 60),
-            }}
-            onClick={handleMarkerClick}
-          />
-          {Object.keys(mapInfo).map((id) => (
-            <Marker
-              key={id}
-              position={mapInfo[id].position}
-              icon={{
-                url:
-                  mapInfo[id].currMotor < mapInfo[id].maxSpace
-                    ? "/available.png"
-                    : "/full.png",
-                scaledSize:
-                  mapInfo[id].currMotor < mapInfo[id].maxSpace
-                    ? new google.maps.Size(60, 60)
-                    : new google.maps.Size(40, 40),
-              }}
-              onClick={() => toggleMarker(id)}
-              label={{
-                text: `Parking Space : ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`,
-                style: markerStyle,
-              }}
+        <>
+          <div className="h-full w-5/6">
+            <GoogleMap
+              mapContainerClassName="h-full"
+              center={currLocation}
+              zoom={15}
+              onLoad={onMapLoad}
+              fullscreenControl={false}
             >
-              {/*markerToggle[id] && (
+              <Marker
+                key="user-location"
+                position={currLocation}
+                icon={{
+                  url: "/motor.png",
+                  scaledSize: new google.maps.Size(60, 60),
+                }}
+                onClick={handleMarkerClick}
+              />
+              {Object.keys(mapInfo).map((id) => (
+                <Marker
+                  key={id}
+                  position={mapInfo[id].position}
+                  icon={{
+                    url:
+                      mapInfo[id].currMotor < mapInfo[id].maxSpace
+                        ? "/available.png"
+                        : "/full.png",
+                    scaledSize:
+                      mapInfo[id].currMotor < mapInfo[id].maxSpace
+                        ? new google.maps.Size(60, 60)
+                        : new google.maps.Size(40, 40),
+                  }}
+                  onClick={() => toggleMarker(id)}
+                  label={{
+                    text: `Parking Space : ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`,
+                    style: markerStyle,
+                  }}
+                >
+                  {/*markerToggle[id] && (
                 <InfoWindow
                   key={`info-window-${id}`}
                   position={mapInfo[id].position}
@@ -140,9 +144,11 @@ export default function GoogleMapContainer() {
                   <div>hi</div>
                 </InfoWindow>
               )*/}
-            </Marker>
-          ))}
-        </GoogleMap>
+                </Marker>
+              ))}
+            </GoogleMap>
+          </div>
+        </>
       )}
     </div>
   );
