@@ -11,6 +11,7 @@ import {
 import useMap from "@/hooks/useMap";
 import Image from "next/image";
 import { io } from "socket.io-client";
+import { useRouter } from "next/navigation";
 
 interface Position {
   lat?: number | undefined;
@@ -62,13 +63,13 @@ export default function GoogleMapContainer() {
   const handleMarkerClick = () => {
     mapRef?.panTo(currLocation);
   };
-
+  const router = useRouter()
   const toggleMarker = (id: string) => {
-    console.log(`run toggle marker for id:${id}`);
+    console.log(`run toggle marker for id:${id}, ${markerToggle[id]}`);
     const tempMarkerToggle = markerToggle;
     tempMarkerToggle[id] = tempMarkerToggle[id] ? false : true;
     setMarkerToggle(tempMarkerToggle);
-    console.log(markerToggle);
+    router.refresh()
   };
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function GoogleMapContainer() {
                 style: markerStyle,
               }}
             >
-              {/*markerToggle[id] && (
+              {markerToggle[id] && (
                 <InfoWindow
                   key={`info-window-${id}`}
                   position={mapInfo[id].position}
@@ -139,7 +140,7 @@ export default function GoogleMapContainer() {
                 >
                   <div>hi</div>
                 </InfoWindow>
-              )*/}
+              )}
             </Marker>
           ))}
         </GoogleMap>

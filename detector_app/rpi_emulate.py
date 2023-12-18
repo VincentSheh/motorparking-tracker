@@ -42,6 +42,7 @@ class RPi_client():
     # self.uuid = str(get_rpi_uuid())
     # TODO: GET GPS MODULE
     latitude, longitude = location
+    self.model_addr = "http://140.112.18.202:3001/detect"
 
 
     self.axes = {'latitude':latitude, 'longitude':longitude}
@@ -67,8 +68,8 @@ class RPi_client():
     return img
       
 
-  def post_img(self, img, api = 'http://localhost:3001/detect'):
-    
+  def post_img(self, img):
+    api = self.model_addr
     #Crop the Image
     # img = self.crop_img(img)
 
@@ -124,9 +125,9 @@ if __name__ == '__main__':
                 ]  
   uuid_list = ["52c5f4c9-332c-4e11-8dcc-4b9b6a56224d",
           "59189b6c-54bf-4471-868b-a8aae1f3bb41",
-          "d8e91f04-ff79-4a6b-bf30-bd209086cc3e",
           "3686144c-9698-4113-8d55-eefe726287e2",
           "72885325-dd5d-4024-821c-fabc064d754e",
+          "d8e91f04-ff79-4a6b-bf30-bd209086cc3e",
           ]
   parking_dir = []
   # for i in range(len(uuid_list)):
@@ -134,7 +135,7 @@ if __name__ == '__main__':
   # for i in range(2):
 
   threads = []
-  for i in range(10):
+  for i in range(5):
     thread = threading.Thread(target=run_rpi_client, args=(uuid_list[i], locations[i]))
     threads.append(thread)
     thread.start()
