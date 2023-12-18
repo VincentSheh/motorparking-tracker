@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   GoogleMap,
   Marker,
@@ -24,13 +25,26 @@ interface Position {
 const socketUrl: any = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
 //const socketPath: any = process.env.NEXT_PUBLIC_SOCKET_PATH;
 
+const markerStyle = {
+  color: "black",
+  fontWeight: "bold",
+  fontSize: "28px",
+};
+
 export default function GoogleMapContainer() {
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    libraries: ["places"],
+  });
+
+  const router = useRouter();
+
   const { mapInfo, markerToggle, setMarkerToggle, setMapInfo } = useMap();
   const [coords, setCoords] = useState(null);
   const [directionResponse, setDirectionResponse] = useState(null);
   const [distance, setDistance] = useState<String>("");
   const [duration, setDuration] = useState<String>("");
-  const [autoComplete, setAutoComplete] = useState(null);
+  //const [autoComplete, setAutoComplete] = useState(null);
 
   const destinationRef = useRef();
 
@@ -49,6 +63,7 @@ export default function GoogleMapContainer() {
     });
   }, []);*/
 
+  /*
   useEffect(() => {
     console.log(mapInfo);
   }, [mapInfo]);
@@ -56,13 +71,9 @@ export default function GoogleMapContainer() {
   useEffect(() => {
     console.log(markerToggle);
   }, [markerToggle]);
+  */
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries: ["places"],
-  });
-
-  const [mapRef, setMapRef] = useState();
+  const [mapRef, setMapRef] = useState(null);
   const [currLocation, setCurrLocation] = useState<Position>({
     lat: 0,
     lng: 0,
@@ -76,7 +87,6 @@ export default function GoogleMapContainer() {
     if (destinationRef?.current.value === "") {
       return;
     }
-    console.log(destinationRef.current.value);
     const directionsService = new google.maps.DirectionsService();
 
     const results = await directionsService.route({
@@ -111,6 +121,7 @@ export default function GoogleMapContainer() {
   const recenter = () => {
     if (directionResponse) {
       calculateRoute();
+      return;
     } else {
       mapRef?.setZoom(15);
       mapRef?.panTo(currLocation);
@@ -121,8 +132,13 @@ export default function GoogleMapContainer() {
     ({ key }: any) => {
       //need to use useCallback or else lupa kenapa. kalo pake handleMarkerClick, setiap re-render dia bakal ke redefined, reference nya juga beda.
       if (key === "r") {
-        mapRef?.panTo(currLocation);
-        mapRef?.setZoom(15);
+        if (directionResponse) {
+          calculateRoute();
+          return;
+        } else {
+          mapRef?.setZoom(15);
+          mapRef?.panTo(currLocation);
+        }
       }
     },
     [currLocation, mapRef]
@@ -134,6 +150,69 @@ export default function GoogleMapContainer() {
     tempMarkerToggle[id] = tempMarkerToggle[id] ? false : true;
     setMarkerToggle(tempMarkerToggle);
     console.log(markerToggle);
+    router.refresh(); //make request to server to refetching data request
+  };
+
+  const handleMarkerButton = async (id: any) => {
+    const position = mapInfo[id]?.position;
+    const geocoder = new google.maps.Geocoder();
+    const response = await geocoder.geocode({ location: position });
+    const positionAddress = response.results[0].formatted_address;
+    const directionsService = new google.maps.DirectionsService();
+    destinationRef.current.value = positionAddress;
+    await calculateRoute();
+    /*
+    const results = await directionsService.route({
+      origin: new google.maps.LatLng(currLocation.lat, currLocation.lng),
+      destination: new google.maps.LatLng(position.lat, position.lng),
+      travelMode: google.maps.TravelMode.DRIVING,
+    });
+    setDirectionResponse(results);
+    setDistance(results.routes[0].legs[0].distance.text);
+    setDuration(results.routes[0].legs[0].duration.text);
+    */
+  };
+
+  const goToNearest = async () => {
+    const directionsService = new google.maps.DirectionsService();
+    const geocoder = new google.maps.Geocoder();
+    const mapInfoIdArr = [];
+    let nearestResult: any = null;
+    let nearestDistance: any = null;
+    let nearestIdx: any = null;
+    Object.keys(mapInfo).forEach((id: any) => {
+      mapInfoIdArr.push(id);
+    });
+    for (let i = 0; i < mapInfoIdArr.length; i++) {
+      const position = mapInfo[mapInfoIdArr[i]]?.position;
+      const result = await directionsService.route({
+        origin: new google.maps.LatLng(currLocation.lat, currLocation.lng),
+        destination: new google.maps.LatLng(position.lat, position.lng),
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+      const distance = result.routes[0].legs[0].distance.value;
+      if (nearestDistance === null) {
+        nearestDistance = distance;
+        nearestResult = result;
+        nearestIdx = i;
+      } else {
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestResult = result;
+          nearestIdx = i;
+        }
+      }
+    }
+    const response = await geocoder.geocode({
+      location: mapInfo[mapInfoIdArr[nearestIdx]].position,
+    });
+    destinationRef.current.value = response.results[0].formatted_address;
+    await calculateRoute();
+    /*
+    setDirectionResponse(nearestResult);
+    setDistance(nearestResult.routes[0].legs[0].distance.text);
+    setDuration(nearestResult.routes[0].legs[0].duration.text);
+    */
   };
 
   useEffect(() => {
@@ -155,12 +234,6 @@ export default function GoogleMapContainer() {
       window.removeEventListener("keyup", handleUserKeyPress);
     };
   }, [handleUserKeyPress]);
-
-  const markerStyle = {
-    color: "black",
-    fontWeight: "bold",
-    fontSize: "28px",
-  };
 
   return (
     <div className="h-screen w-screen min-w-96 flex flex-row">
@@ -210,15 +283,22 @@ export default function GoogleMapContainer() {
                     style: markerStyle,
                   }}
                 >
-                  {/*markerToggle[id] && (
-                <InfoWindow
-                  key={`info-window-${id}`}
-                  position={mapInfo[id].position}
-                  onCloseClick={() => toggleMarker(id)}
-                >
-                  <div>hi</div>
-                </InfoWindow>
-              )*/}
+                  {markerToggle[id] && (
+                    <InfoWindow
+                      key={`info-window-${id}`}
+                      position={mapInfo[id].position}
+                      onCloseClick={() => toggleMarker(id)}
+                    >
+                      <Button
+                        key={`info-window-button-${id}`}
+                        className="h-4 w-12"
+                        text={"GO"}
+                        onClick={() => {
+                          handleMarkerButton(id);
+                        }}
+                      />
+                    </InfoWindow>
+                  )}
                 </Marker>
               ))}
               {directionResponse && (
@@ -240,6 +320,17 @@ export default function GoogleMapContainer() {
               />
             </Autocomplete>
             <Button className="h-12 w-28" text={"CLEAR"} onClick={clearRoute} />
+            {directionResponse && (
+              <div className="flex flex-col justify-center items-center gap-2 h-28 w-52 rounded-md bg-white">
+                <div className="font-bold text-xl text-center bg-blue-500 text-white rounded-lg py-1 px-3">{`Distance : ${distance}`}</div>
+                <div className="font-bold text-xl text-center bg-blue-500 text-white rounded-lg py-1 px-3">{`Duration : ${duration}`}</div>
+              </div>
+            )}
+            <Button
+              className="h-18 w-40"
+              text={"GO TO NEAREST"}
+              onClick={goToNearest}
+            />
           </div>
         </>
       )}
