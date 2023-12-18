@@ -24,7 +24,7 @@ const AdminSidebar = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-16 bg-gray-200">
+      <div className={`w-16 bg-gray-200 border-r border-black border-t-0 border-2`}>
       <IconButton
             size="large"
             edge="start"
@@ -39,7 +39,7 @@ const AdminSidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`w-64 bg-gray-200 ${isSidebarOpen ? "" : "hidden"}`}
+        className={`w-64 bg-gray-200 border-r border-black border-t-0 border-2 ${isSidebarOpen ? "" : "hidden"}`}
         style={{ boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)" }}
       >
         <div className="p-2">

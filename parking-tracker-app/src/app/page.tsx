@@ -14,7 +14,7 @@ const Home = () => {
       <div className="relative z-20 text-center text-white">
         <MotorparkingTrackerList />
         <div className="mt-8 flex items-center justify-center">
-          <Button as={Link} href="/map" text="Try Now!" alt="Motorcycle" />
+          <Button as={Link} href="/map" text="Try Now!" pict="/motor.png" alt="Motorcycle"/>
         </div>
       </div>
     </div>

@@ -8,42 +8,56 @@ export default function AddParking() {
   return (
     <div className="space-y-2">
       <div className="space-y-1">
-        <Label htmlFor="latitude">Latitude</Label>
+        <Label htmlFor="latitude" className="text-purple-700 font-bold">
+          Latitude
+        </Label>
         <Input
           id="latitude"
-          placeholder="25.01370607644918"
+          placeholder="25.0137"
           defaultValue=""
-          className="border border-black"
+          className="border border-purple-500 rounded-md p-2"
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="longitude">Longitude</Label>
+        <Label htmlFor="longitude" className="text-blue-700 font-bold">
+          Longitude
+        </Label>
         <Input
           id="longitude"
-          placeholder="121.53468199176018"
+          placeholder="121.5347"
           defaultValue=""
-          className="border border-black"
+          className="border border-blue-500 rounded-md p-2"
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="uuid">UUID</Label>
+        <Label htmlFor="uuid" className="text-green-700 font-bold">
+          UUID
+        </Label>
         <Input
           id="uuid"
           placeholder="Device UUID"
           defaultValue=""
-          className="border border-black"
+          className="border border-green-500 rounded-md p-2"
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="availableSlots">Available Slots</Label>
+        <Label htmlFor="availableSlots" className="text-red-700 font-bold">
+          Available Slots
+        </Label>
         <Input
           id="availableSlots"
           placeholder="10"
           defaultValue=""
-          className="border border-black"
+          className="border border-red-500 rounded-md p-2"
         />
       </div>
-      <Button onClick={addParking}>Save changes</Button>
+      <Button
+        onClick={addParking}
+        className="bg-purple-700 text-white p-2 rounded-md hover:bg-purple-800"
+      >
+        Save changes
+      </Button>
     </div>
+    
   );
 }
