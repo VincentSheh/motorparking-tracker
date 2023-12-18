@@ -108,9 +108,13 @@ export default function GoogleMapContainer() {
   };
   */
 
-  const handleMarkerClick = () => {
-    mapRef?.setZoom(15);
-    mapRef?.panTo(currLocation);
+  const recenter = () => {
+    if (directionResponse) {
+      calculateRoute();
+    } else {
+      mapRef?.setZoom(15);
+      mapRef?.panTo(currLocation);
+    }
   };
 
   const handleUserKeyPress = useCallback(
@@ -184,7 +188,7 @@ export default function GoogleMapContainer() {
                   url: "/motor.png",
                   scaledSize: new google.maps.Size(60, 60),
                 }}
-                onClick={handleMarkerClick}
+                onClick={recenter}
               />
               {Object.keys(mapInfo).map((id) => (
                 <Marker
@@ -227,7 +231,7 @@ export default function GoogleMapContainer() {
             <Button
               className="h-12 w-28"
               text={"RECENTER"}
-              onClick={handleMarkerClick}
+              onClick={recenter}
             />
             <Autocomplete>
               <SearchInput
@@ -235,11 +239,7 @@ export default function GoogleMapContainer() {
                 onGoClick={calculateRoute}
               />
             </Autocomplete>
-            <Button
-              className="h-12 w-28"
-              text={"CLEAR"}
-              onClick={clearRoute}
-            />
+            <Button className="h-12 w-28" text={"CLEAR"} onClick={clearRoute} />
           </div>
         </>
       )}
