@@ -22,7 +22,7 @@ export default function Button<T extends React.ElementType = "button">({
     <Component
       {...props}
       className={twMerge(
-        "flex w-56 items-center justify-center gap-2 rounded-lg bg-blue-500 p-3 text-white active:bg-blue-600 disabled:bg-gray-200 md:w-60 lg:w-64 xl:w-72",
+        "flex w-56 items-center justify-center gap-2 rounded-lg bg-blue-500 p-3 text-white active:bg-blue-600 disabled:bg-gray-200",
         props.className
       )}
     >
