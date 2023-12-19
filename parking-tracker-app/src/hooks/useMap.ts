@@ -28,7 +28,7 @@ export default function useMap() {
   const router = useRouter()
 
   const fetchParkings = async () => {
-    const res = await fetch("http://localhost:3000/api/parkings")
+    const res = await fetch("/api/parkings")
     if (!res.ok) {
       setMapInfo({});
       // router.push("/map");

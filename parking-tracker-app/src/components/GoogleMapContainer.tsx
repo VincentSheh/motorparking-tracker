@@ -1,17 +1,21 @@
 "use client";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCompass, faBroom, faParking } from "@fortawesome/free-solid-svg-icons";
 import {
   GoogleMap,
   Marker,
+  Autocomplete,
   useLoadScript,
   useJsApiLoader,
   DirectionsRenderer,
+  InfoWindow,
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
 import SearchInput from "./SearchInput";
-import AutocompleteContainer from "./Search";
 import Image from "@/app/admin/_components/image";
+import Button from "./Button";
 
 interface Position {
   lat?: number | undefined;
@@ -217,15 +221,35 @@ export default function GoogleMapContainer() {
               )}
             </Marker>
           ))}
+        <div className="absolute top-20 pl-3 flex items-center">
+          <Autocomplete>
+            <SearchInput destinationRef={destinationRef} onGoClick={calculateRoute} />
+          </Autocomplete>
+          <div className="h-8 w-8 ml-2 rounded-full bg-black flex items-center justify-center">
+            <FontAwesomeIcon icon={faBroom} className="text-2xl text-white" onClick={clearRoute} />
+          </div>
+        </div>
+        <div className="absolute top-10 py-24 pl-5 cursor-pointer">
+          <FontAwesomeIcon
+            icon={faCompass}
+            className="text-4xl text-black-500"
+            onClick={recenter}
+          />
+        </div>
+        <div className="absolute top-10 py-36 pl-5 cursor-pointer">
+          <FontAwesomeIcon
+            icon={faParking}
+            className="text-4xl text-black-500"
+            onClick={goToNearest}
+          />
+        </div>
+
           {directionResponse && (
             <DirectionsRenderer directions={directionResponse} />
           )}
         </GoogleMap>
       )}
-      <div className="absolute top-0 left-0 p-4">
-        <AutocompleteContainer destinationRef={destinationRef} calculateRoute={calculateRoute} />
-        <SearchInput destinationRef={destinationRef} onGoClick={calculateRoute} />
-      </div>
+
     </div>
   );
 }

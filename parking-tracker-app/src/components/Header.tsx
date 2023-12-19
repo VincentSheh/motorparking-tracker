@@ -8,20 +8,23 @@ export default function Header() {
   const isHomePage = pathname === "/";
 
   return (
-    <div className="hidden md:flex bg-black bg-opacity-25 flex-row items-center justify-between py-5 top-0 z-50 relative w-full header">
-      <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl ml-5 font-cursive whitespace-nowrap">
-        PARKING TRACKER
-      </h2>
-      <div className="flex flex-row items-center mr-5">
-        <Link className={`px-2 text-black hover:text-gray-800 ${isHomePage ? 'underline' : ''} font-cursive nav-link`} href={isHomePage ? "/admin" : "/"}>
+
+    <div className="bg-white flex flex-col md:flex-row items-center justify-center py-3 md:py-5 top-0 z-50 relative">
+      <div className="flex flex-col md:flex-row items-center px-3 md:px-5 mb-2 md:mb-0 md:absolute start-0">
+        <UserButton />
+        <Link className="px-2" href={isHomePage ? "/admin" : "/"}>
           {isHomePage ? "Admin" : "Home"}
         </Link>
-        <UserButton />
-        <Link className="px-2 text-black hover:text-gray-800 underline font-cursive nav-link" href="/map">
+      </div>
+      <h2 className="text-xl md:text-3xl lg:text-4xl xl:text-4xl mb-2 md:mb-0">
+        PARKING TRACKER
+      </h2>
+      <div className="flex flex-col md:flex-row items-center px-3 md:px-5 md:absolute end-0">
+        <Link className="px-2" href="/map">
           Map
         </Link>
       </div>
     </div>
   );
-}
 
+}
