@@ -225,6 +225,7 @@ export default function GoogleMapContainer() {
                         }}
                       />
                   </div>
+
                 </InfoWindow>
               )}
             </Marker>
