@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load your image
-img = cv2.imread('illegal2.png')
+img = cv2.imread('illegal3.png')
 polygon_points = [] #TODO: 
 
 def get_points(event, x, y, flags, param):

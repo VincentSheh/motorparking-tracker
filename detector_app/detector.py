@@ -49,20 +49,20 @@ def decode_json(request):
         cv2_img = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
     return parking_data, cv2_img  
 
-#Crop Image using polygons
+#Mask the Image using polygons
 def crop_img(img, polygon_points):
     img = img.copy()
     if len(polygon_points) == 0: return img, np.zeros_like(img)
     pts = np.array(polygon_points, np.int64)
     pts = pts.reshape((-1, 1, 2))
 
-    mask = np.zeros_like(img) #Create a black image with similar shape as original
+    # mask = np.zeros_like(img) #Create a black image with similar shape as original
 
-    cv2.fillPoly(mask, [pts], (255, 255, 255)) #Insert the polygon and fill it with white
+    # cv2.fillPoly(mask, [pts], (255, 255, 255)) #Insert the polygon and fill it with white
 
-    result = cv2.bitwise_and(img, mask) #Perform intersection of the masked image and the original
-    illegal_parking = cv2.fillPoly(img, [pts], (0,0,0))
-    return result, illegal_parking
+    # result = cv2.bitwise_and(img, mask) #Perform intersection of the masked image and the original
+    illegal_parking = cv2.fillPoly(img, [pts], (0,255,0)) #Fill Polygon with Green
+    return img, illegal_parking
   
 def send_detection_count(parking_data, n_motor, exist):
     try:#TODO: CHANGE ID TO UUID
@@ -102,15 +102,16 @@ def detect_image():
     cv2.imwrite('rec_img.jpg', park_img)  # Consider a more dynamic file naming
     result = model.predict(park_img, classes=3, verbose=False)
     ill_result = model.predict(ill_park_img, classes=3, verbose =False)
-    n_motor = len(result[0].boxes.xyxy)
+    tot_n_motor = len(result[0].boxes.xyxy)
     n_ill_motor = len(ill_result[0].boxes.xyxy)
-    print("Number of Motorcycle is ", n_motor)
+    n_park_motor = tot_n_motor - n_ill_motor
+    print("Number of Parked Motorcycles is ", n_park_motor)
     print("Illegal Parkings: ", n_ill_motor)
     
     #Upload to firebase if detect illegal parking image
     upload_to_cloud(parking_data, cv2_img, n_ill_motor)
-    insert_parkinglot(parking_data, n_motor)
-    send_detection_count(parking_data, n_motor, exist)
+    insert_parkinglot(parking_data, n_park_motor)
+    send_detection_count(parking_data, n_park_motor, exist)
     return jsonify({"message": "Inference started"})
 
 
