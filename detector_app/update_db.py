@@ -6,6 +6,7 @@ from datetime import datetime
 import pyrebase
 from typing import Union
 import cv2
+from playhouse.db_url import connect
 
 firebaseConfig = {
   "apiKey": "AIzaSyBaAPC0iP8TzIfmYPeWe0FG2K57eAcRrSQ",
@@ -21,7 +22,14 @@ firebaseConfig = {
 }
 
 
-db = PostgresqlDatabase('parking-tracker', user='postgres', password='postgres', host='localhost', port=5432)
+# db = PostgresqlDatabase('parking-tracker', user='postgres', password='postgres', host='localhost', port=5432)
+# db = PostgresqlDatabase('motorparking', 
+#                         user='sheh.v123', 
+#                         password='sBVKiN3FY2OT', 
+#                         host='ep-nameless-surf-69829213-pooler.us-east-2.aws.neon.tech', 
+#                         endpointid='ep-nameless-surf-69829213-pooler'
+                        # sslmode='require')
+db = connect("postgresql://sheh.v123:sBVKiN3FY2OT@ep-nameless-surf-69829213-pooler.us-east-2.aws.neon.tech/motorparking?sslmode=require&options=endpoint%3Dep-nameless-surf-69829213-pooler")
 
 class Parkings(Model):
     id = IntegerField(primary_key=True)  # Serial in PostgreSQL is typically represented as an IntegerField in Peewee
