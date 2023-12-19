@@ -14,7 +14,7 @@ import {
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
 import SearchInput from "./SearchInput";
-import Image from "@/app/admin/_components/image";
+import Image from "@/app/admin/_components/Imageformap";
 import Button from "./Button";
 
 interface Position {
