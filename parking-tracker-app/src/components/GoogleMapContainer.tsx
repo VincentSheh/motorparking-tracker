@@ -14,7 +14,7 @@ import {
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
 import SearchInput from "./SearchInput";
-import Image from "@/app/admin/_components/image";
+import Image from "@/app/admin/_components/Imageformap";
 import Button from "./Button";
 
 interface Position {
@@ -210,13 +210,24 @@ export default function GoogleMapContainer() {
                   position={mapInfo[id].position}
                   onCloseClick={() => toggleMarker(id)}
                 >
-                  <div style={{ width: '300px', height: '300px' }}>
-                    <p>ID: {id}</p>
-                    <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
-                    <p>Current Motor: {mapInfo[id].currMotor}</p>
-                    <p>Max Space: {mapInfo[id].maxSpace}</p>
-                    <Image folderPath={id} alt={`Parking Space ${id}`} />
+                  <div style={{ width: '300px', height: '300px', padding: '16px', fontFamily: 'Arial, sans-serif', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', borderRadius: '8px', background: '#fff', color: '#333' }}>
+                    <h2 style={{ fontSize: '1.2em', marginBottom: '10px', borderBottom: '1px solid #ddd', paddingBottom: '8px' }}>Parking Space </h2>
+                    <p style={{ fontSize: '0.9em', margin: '8px 0' }}>ID: {id}</p>
+                    <p style={{ fontSize: '0.9em', margin: '8px 0' }}>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
+                    <p style={{ fontSize: '0.9em', margin: '8px 0' }}>Current Motor: {mapInfo[id].currMotor}</p>
+                    <p style={{ fontSize: '0.9em', margin: '8px 0' }}>Max Space: {mapInfo[id].maxSpace}</p>
+                    <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                      <Image folderPath={id} alt={`Parking Space ${id}`} />
+                    </div>
                   </div>
+                  <Button
+                        key={`info-window-button-${id}`}
+                        className="h-4 w-10"
+                        text={"GO"}
+                        onClick={() => {
+                          handleMarkerButton(id);
+                        }}
+                      />
                 </InfoWindow>
               )}
             </Marker>
