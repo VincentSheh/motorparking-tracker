@@ -228,20 +228,19 @@ export default function GoogleMapContainer() {
           <div className="h-8 w-8 ml-2 rounded-full bg-black flex items-center justify-center">
             <FontAwesomeIcon icon={faBroom} className="text-2xl text-white" onClick={clearRoute} />
           </div>
-          <div className="h-8 w-8 ml-4">
-          <FontAwesomeIcon
-            icon={faParking}
-            className="text-4xl text-black-500"
-            onClick={goToNearest}
-          />
         </div>
-        </div>
-
         <div className="absolute top-10 py-24 pl-5 cursor-pointer">
           <FontAwesomeIcon
             icon={faCompass}
             className="text-4xl text-black-500"
             onClick={recenter}
+          />
+        </div>
+        <div className="absolute top-10 py-36 pl-5 cursor-pointer">
+          <FontAwesomeIcon
+            icon={faParking}
+            className="text-4xl text-black-500"
+            onClick={goToNearest}
           />
         </div>
 
