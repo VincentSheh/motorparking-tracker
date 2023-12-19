@@ -5,26 +5,18 @@ import {
   GoogleMap,
   Marker,
   useLoadScript,
-  useGoogleMap,
-  InfoWindow,
-  OverlayView,
-  Autocomplete,
   useJsApiLoader,
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
-import { io } from "socket.io-client";
-import Button from "./Button";
 import SearchInput from "./SearchInput";
-import Image from "@/app/admin/_components/Imageformap";
-
+import AutocompleteContainer from "./Search";
+import Image from "@/app/admin/_components/image";
 
 interface Position {
   lat?: number | undefined;
   lng?: number | undefined;
 }
-const socketUrl: any = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
-//const socketPath: any = process.env.NEXT_PUBLIC_SOCKET_PATH;
 
 const markerStyle = {
   color: "black",
@@ -41,38 +33,9 @@ export default function GoogleMapContainer() {
   const router = useRouter();
 
   const { mapInfo, markerToggle, setMarkerToggle, setMapInfo } = useMap();
-  const [coords, setCoords] = useState(null);
   const [directionResponse, setDirectionResponse] = useState(null);
-  const [distance, setDistance] = useState<String>("");
-  const [duration, setDuration] = useState<String>("");
-  //const [autoComplete, setAutoComplete] = useState(null);
 
   const destinationRef = useRef();
-
-  /*
-  useEffect(() => {
-    const socket = io(socketUrl);
-    socket.on("initialization", (data: any) => {
-      setMapInfo(data);
-    });
-    socket.on("update", (data: any) => {
-      const { id, currMotor } = data;
-      setMapInfo((prev) => ({
-        ...prev,
-        ...(prev[id]["currMotor"] = currMotor),
-      }));
-    });
-  }, []);*/
-
-  /*
-  useEffect(() => {
-    console.log(mapInfo);
-  }, [mapInfo]);
-
-  useEffect(() => {
-    console.log(markerToggle);
-  }, [markerToggle]);
-  */
 
   const [mapRef, setMapRef] = useState(null);
   const [currLocation, setCurrLocation] = useState<Position>({
@@ -96,28 +59,14 @@ export default function GoogleMapContainer() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
     setDirectionResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration.text);
   };
 
   const clearRoute = () => {
     setDirectionResponse(null);
-    setDistance("");
-    setDuration("");
     destinationRef.current.value = "";
     mapRef?.setZoom(15);
     mapRef?.panTo(currLocation);
   };
-
-  /*
-  const onLoad = (autoC: any) => setAutoComplete(autoC);
-
-  const onPlaceChanged = () => {
-    const lat = autoComplete?.getPlace().geometry.location.lat();
-    const lng = autoComplete?.getPlace().geometry.location.lng();
-    setCoords({ lat, lng });
-  };
-  */
 
   const recenter = () => {
     if (directionResponse) {
@@ -131,7 +80,6 @@ export default function GoogleMapContainer() {
 
   const handleUserKeyPress = useCallback(
     ({ key }: any) => {
-      //need to use useCallback or else lupa kenapa. kalo pake handleMarkerClick, setiap re-render dia bakal ke redefined, reference nya juga beda.
       if (key === "r") {
         if (directionResponse) {
           calculateRoute();
@@ -146,12 +94,10 @@ export default function GoogleMapContainer() {
   );
 
   const toggleMarker = (id: string) => {
-    console.log(`run toggle marker for id:${id}`);
     const tempMarkerToggle = markerToggle;
-    tempMarkerToggle[id] = tempMarkerToggle[id] ? false : true;
+    tempMarkerToggle[id] = !tempMarkerToggle[id];
     setMarkerToggle(tempMarkerToggle);
-    console.log(markerToggle);
-    router.refresh(); //make request to server to refetching data request
+    router.refresh();
   };
 
   const handleMarkerButton = async (id: any) => {
@@ -159,31 +105,18 @@ export default function GoogleMapContainer() {
     const geocoder = new google.maps.Geocoder();
     const response = await geocoder.geocode({ location: position });
     const positionAddress = response.results[0].formatted_address;
-    const directionsService = new google.maps.DirectionsService();
     destinationRef.current.value = positionAddress;
     await calculateRoute();
-    /*
-    const results = await directionsService.route({
-      origin: new google.maps.LatLng(currLocation.lat, currLocation.lng),
-      destination: new google.maps.LatLng(position.lat, position.lng),
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration.text);
-    */
   };
 
   const goToNearest = async () => {
     const directionsService = new google.maps.DirectionsService();
     const geocoder = new google.maps.Geocoder();
-    const mapInfoIdArr = [];
+    const mapInfoIdArr = Object.keys(mapInfo);
     let nearestResult: any = null;
     let nearestDistance: any = null;
     let nearestIdx: any = null;
-    Object.keys(mapInfo).forEach((id: any) => {
-      mapInfoIdArr.push(id);
-    });
+
     for (let i = 0; i < mapInfoIdArr.length; i++) {
       const position = mapInfo[mapInfoIdArr[i]]?.position;
       const result = await directionsService.route({
@@ -192,28 +125,18 @@ export default function GoogleMapContainer() {
         travelMode: google.maps.TravelMode.DRIVING,
       });
       const distance = result.routes[0].legs[0].distance.value;
-      if (nearestDistance === null) {
+      if (nearestDistance === null || distance < nearestDistance) {
         nearestDistance = distance;
         nearestResult = result;
         nearestIdx = i;
-      } else {
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestResult = result;
-          nearestIdx = i;
-        }
       }
     }
+
     const response = await geocoder.geocode({
       location: mapInfo[mapInfoIdArr[nearestIdx]].position,
     });
     destinationRef.current.value = response.results[0].formatted_address;
     await calculateRoute();
-    /*
-    setDirectionResponse(nearestResult);
-    setDistance(nearestResult.routes[0].legs[0].distance.text);
-    setDuration(nearestResult.routes[0].legs[0].duration.text);
-    */
   };
 
   useEffect(() => {
@@ -237,7 +160,7 @@ export default function GoogleMapContainer() {
   }, [handleUserKeyPress]);
 
   return (
-    <div className="h-screen w-screen">
+    <div className="relative h-screen w-screen">
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
@@ -248,12 +171,6 @@ export default function GoogleMapContainer() {
           onLoad={onMapLoad}
           fullscreenControl={false}
         >
-                    <Autocomplete>
-              <SearchInput
-                destinationRef={destinationRef}
-                onGoClick={calculateRoute}
-              />
-            </Autocomplete>
           <Marker
             key="user-location"
             position={currLocation}
@@ -283,28 +200,32 @@ export default function GoogleMapContainer() {
                 style: markerStyle,
               }}
             >
-            {markerToggle[id] && (
-              <InfoWindow
-                key={`info-window-${id}`}
-                position={mapInfo[id].position}
-                onCloseClick={() => toggleMarker(id)}
-              >
-                <div style={{ width: '300px', height: '300px' }}>
-                  <p>ID: {id}</p>
-                  <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
-                  <p>Current Motor: {mapInfo[id].currMotor}</p>
-                  <p>Max Space: {mapInfo[id].maxSpace}</p>
-                  <Image folderPath={id} alt={`Parking Space ${id}`} />
-                </div>
-              </InfoWindow>
-            )}
-            </Marker>
-              ))}
-              {directionResponse && (
-                <DirectionsRenderer directions={directionResponse} />
+              {markerToggle[id] && (
+                <InfoWindow
+                  key={`info-window-${id}`}
+                  position={mapInfo[id].position}
+                  onCloseClick={() => toggleMarker(id)}
+                >
+                  <div style={{ width: '300px', height: '300px' }}>
+                    <p>ID: {id}</p>
+                    <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
+                    <p>Current Motor: {mapInfo[id].currMotor}</p>
+                    <p>Max Space: {mapInfo[id].maxSpace}</p>
+                    <Image folderPath={id} alt={`Parking Space ${id}`} />
+                  </div>
+                </InfoWindow>
               )}
-            </GoogleMap>
+            </Marker>
+          ))}
+          {directionResponse && (
+            <DirectionsRenderer directions={directionResponse} />
+          )}
+        </GoogleMap>
       )}
+      <div className="absolute top-0 left-0 p-4">
+        <AutocompleteContainer destinationRef={destinationRef} calculateRoute={calculateRoute} />
+        <SearchInput destinationRef={destinationRef} onGoClick={calculateRoute} />
+      </div>
     </div>
   );
 }
