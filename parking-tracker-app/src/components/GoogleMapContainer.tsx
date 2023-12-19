@@ -13,10 +13,10 @@ import {
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import useMap from "@/hooks/useMap";
-import Image from "next/image";
 import { io } from "socket.io-client";
 import Button from "./Button";
 import SearchInput from "./SearchInput";
+import Image from "@/app/admin/_components/Imageformap";
 
 interface Position {
   lat?: number | undefined;
@@ -289,14 +289,24 @@ export default function GoogleMapContainer() {
                       position={mapInfo[id].position}
                       onCloseClick={() => toggleMarker(id)}
                     >
-                      <Button
-                        key={`info-window-button-${id}`}
-                        className="h-4 w-12"
-                        text={"GO"}
-                        onClick={() => {
-                          handleMarkerButton(id);
-                        }}
-                      />
+                      <>
+                        <div style={{ width: '300px', height: '300px' }}>
+                          <p>ID: {id}</p>
+                          <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
+                          <p>Current Motor: {mapInfo[id].currMotor}</p>
+                          <p>Max Space: {mapInfo[id].maxSpace}</p>
+                          <Image folderPath={id} alt={`Parking Space ${id}`} />
+                        </div>
+                        <Button
+                          key={`info-window-button-${id}`}
+                          className="h-4 w-12"
+                          text={"GO"}
+                          onClick={() => {
+                            handleMarkerButton(id);
+                          }}
+                        />                      
+                      </>
+
                     </InfoWindow>
                   )}
                 </Marker>

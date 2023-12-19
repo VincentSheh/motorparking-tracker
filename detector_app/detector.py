@@ -4,13 +4,13 @@ import json
 import cv2
 from flask import Flask, request, jsonify
 from ultralytics import YOLO
-from update_db import create_or_get_parking, get_polygons, upload_firebase
+from update_db import create_or_update_parking, get_polygons, upload_firebase
 # Initialize Flask app
 app = Flask(__name__)
 
 # Load YOLO model
 def load_model():
-    return YOLO('yolov8l.pt')
+    return YOLO('yolov8x.pt')
 
 model = load_model()
 
@@ -31,7 +31,7 @@ def insert_parkinglot(parking_data, n_motor):
     longitude = float(parking_data['longitude'])
     # curr_motor = int(parking_data['curr_motor'])
     curr_motor = n_motor
-    create_or_get_parking(uuid, latitude, longitude, curr_motor)
+    create_or_update_parking(uuid, latitude, longitude, curr_motor)
 
 def get_parkinglot_polygons_and_is_exist(display_id):
     polygon_list, exist = get_polygons(display_id)
@@ -51,7 +51,7 @@ def decode_json(request):
 
 #Mask the Image using polygons
 def crop_img(img, polygon_points):
-    img = img.copy()
+    orig_img = img.copy()
     if len(polygon_points) == 0: return img, np.zeros_like(img)
     pts = np.array(polygon_points, np.int64)
     pts = pts.reshape((-1, 1, 2))
@@ -62,30 +62,44 @@ def crop_img(img, polygon_points):
 
     # result = cv2.bitwise_and(img, mask) #Perform intersection of the masked image and the original
     illegal_parking = cv2.fillPoly(img, [pts], (0,255,0)) #Fill Polygon with Green
-    return img, illegal_parking
+    return orig_img, illegal_parking
   
 def send_detection_count(parking_data, n_motor, exist):
     try:#TODO: CHANGE ID TO UUID
-        if not exist:
+        # if not exist:
+        if True:
             data_dict = {'id': parking_data['uuid'],
                          'latitude': parking_data['latitude'],
                          'longitude': parking_data['longitude'],
                          'currMotor': n_motor} 
-            socket_action = 'create'
+            socket_action = 'update'
         else:
             data_dict = {'id': parking_data['uuid'], 'currMotor': n_motor}
             socket_action = 'update'
-        print(data_dict, socket_action)
+        print(data_dict['id'], socket_action)
         json_data = json.dumps(data_dict)
         msg = ' '.join([socket_action, json_data])
         client_socket.send(msg.encode())
     except Exception as e:
         print(f"ERROR! sending data: {e}")
         
-def upload_to_cloud(parking_data, image, n_ill_motor):
+def upload_to_cloud(parking_data, image, n_ill_motor, ill_result):
     upload_firebase(parking_data['uuid'], image)
     if n_ill_motor >0:
-        upload_firebase("Illegal Parkings", image) 
+        boxed_img = image.copy()
+        ill_result = ill_result[0]
+        for detection in ill_result.boxes.xyxy:
+            # Extract bounding box coordinates
+            x1, y1, x2, y2 = detection
+            start_point = (int(x1), int(y1))
+            end_point = (int(x2), int(y2))
+
+            # Custom color (e.g., red in BGR)
+            color = (0, 0, 255)  # BGR format
+
+            # Draw the rectangle
+            boxed_img = cv2.rectangle(boxed_img, start_point, end_point, color, 2)            
+        upload_firebase("Illegal Parkings", boxed_img)  
         
 @app.route("/")
 @app.route("/hello")
@@ -99,17 +113,21 @@ def detect_image():
     polygon_points, exist = get_parkinglot_polygons_and_is_exist(parking_data['uuid'])
     
     park_img, ill_park_img = crop_img(cv2_img, polygon_points)
-    cv2.imwrite('rec_img.jpg', park_img)  # Consider a more dynamic file naming
-    result = model.predict(park_img, classes=3, verbose=False)
-    ill_result = model.predict(ill_park_img, classes=3, verbose =False)
+    cv2.imwrite("park_img.jpg", park_img)
+    cv2.imwrite("ill_park_img.jpg", ill_park_img)
+
+    result = model.predict(park_img, classes=3, conf = 0.4, save=True, verbose=False)
+    ill_result = model.predict(ill_park_img, classes=3, conf = 0.5, save=False , verbose =False)
     tot_n_motor = len(result[0].boxes.xyxy)
     n_ill_motor = len(ill_result[0].boxes.xyxy)
     n_park_motor = tot_n_motor - n_ill_motor
+    if n_park_motor < 0:
+        n_park_motor = 0
     print("Number of Parked Motorcycles is ", n_park_motor)
     print("Illegal Parkings: ", n_ill_motor)
     
     #Upload to firebase if detect illegal parking image
-    upload_to_cloud(parking_data, cv2_img, n_ill_motor)
+    upload_to_cloud(parking_data, park_img, n_ill_motor, ill_result)
     insert_parkinglot(parking_data, n_park_motor)
     send_detection_count(parking_data, n_park_motor, exist)
     return jsonify({"message": "Inference started"})

@@ -29,7 +29,7 @@ firebaseConfig = {
 #                         host='ep-nameless-surf-69829213-pooler.us-east-2.aws.neon.tech', 
 #                         endpointid='ep-nameless-surf-69829213-pooler'
                         # sslmode='require')
-db = connect("postgresql://sheh.v123:sBVKiN3FY2OT@ep-nameless-surf-69829213-pooler.us-east-2.aws.neon.tech/motorparking?sslmode=require&options=endpoint%3Dep-nameless-surf-69829213-pooler")
+db = connect("postgresql://sheh.v123:U6flPHb9zJmi@ep-ancient-dust-68879695-pooler.ap-southeast-1.aws.neon.tech/not?sslmode=require&options=endpoint%3Dep-ancient-dust-68879695-pooler")
 
 class Parkings(Model):
     id = IntegerField(primary_key=True)  # Serial in PostgreSQL is typically represented as an IntegerField in Peewee
@@ -48,17 +48,19 @@ class Parkings(Model):
       
 db.connect()
 
-def create_or_get_parking(display_id: str, latitude: str = None, longitude: str = None, curr_motor: int = 0, max_space: int = 0):
+def create_or_update_parking(display_id: str, latitude: str = None, longitude: str = None, curr_motor: int = 0, max_space: int = 0):
     defaults = dict()
-    if max_space==0: #Create Parking
+    # if max_space==0: #Create Parking
+    if True:  
       defaults = {'display_id':display_id, 'latitude': latitude, 'longitude': longitude, 'curr_motor':curr_motor}
-      print("Created: ", defaults)
-      
     else: #Update Parking
       defaults = {'curr_motor': curr_motor}
     parking, created = Parkings.get_or_create(
       display_id=display_id,
       defaults=defaults)
+    if not created:
+      
+      Parkings.update(curr_motor = curr_motor).where(Parkings.display_id == display_id).execute()
     return parking
   
 def get_polygons(display_id: uuid.UUID):
@@ -75,7 +77,6 @@ def get_polygons(display_id: uuid.UUID):
 def upload_firebase(folder_name:Union[uuid.UUID, str], img):
   firebase = pyrebase.initialize_app(firebaseConfig)
   storage = firebase.storage()
-  cv2.imwrite("test.jpg", img)
   current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
   success, encoded_img = cv2.imencode('.jpg', img)
   # image_data = encoded_img.tobytes()

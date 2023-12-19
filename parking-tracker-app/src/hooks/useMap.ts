@@ -64,7 +64,6 @@ export default function useMap() {
       // setMapInfo(data);
     });
     socket.on("create", (data:any)=>{
-      console.log("SOCKETTT", data)
       const{id, latitude, longitude, currMotor} =data
       setMapInfo((prev:any) =>({
         ...prev,
@@ -78,6 +77,7 @@ export default function useMap() {
 
     
     socket.on("update", (data: any) => {
+      console.log("SOCKETTT", data)
       const { id, currMotor } = data;
       setMapInfo((prev:any) =>({
         ...prev,

@@ -121,6 +121,7 @@ class Server {
   handleUpdateParkingInfo(data: UpdateParkingData) {
     const id = data["id"];
     const currMotor = data["currMotor"];
+    console.log(data)
     // this.parkingInfos[id]["currMotor"] = currMotor;
     this.io.emit("update", {
       id,
