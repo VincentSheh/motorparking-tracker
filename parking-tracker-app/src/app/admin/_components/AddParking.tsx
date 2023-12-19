@@ -84,7 +84,6 @@ export default function AddParking() {
           placeholder="121.5347"
           className="border border-blue-500 rounded-md p-2"
           onChange={(e) => handleInputChange(e, setLongitude)}
-
         />
       </div>
       <div className="space-y-1">
