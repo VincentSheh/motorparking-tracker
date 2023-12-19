@@ -176,7 +176,7 @@ export default function GoogleMapContainer() {
             position={currLocation}
             icon={{
               url: "/motor.png",
-              scaledSize: new google.maps.Size(60, 60),
+              scaledSize: new google.maps.Size(30, 30),
             }}
             onClick={recenter}
           />
@@ -191,8 +191,8 @@ export default function GoogleMapContainer() {
                     : "/full.png",
                 scaledSize:
                   mapInfo[id].currMotor < mapInfo[id].maxSpace
-                    ? new google.maps.Size(60, 60)
-                    : new google.maps.Size(40, 40),
+                    ? new google.maps.Size(20, 20)
+                    : new google.maps.Size(20, 20),
               }}
               onClick={() => toggleMarker(id)}
               label={{
