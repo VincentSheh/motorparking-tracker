@@ -2,8 +2,9 @@ import cv2
 import numpy as np
 
 # Load your image
-img = cv2.imread('illegal3.png')
-polygon_points = [] #TODO: 
+image_path = input("Enter the image file name: ")
+img = cv2.imread(image_path)
+polygon_points = []
 
 def get_points(event, x, y, flags, param):
   if event == cv2.EVENT_LBUTTONDOWN:
