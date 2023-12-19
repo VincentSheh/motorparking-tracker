@@ -43,8 +43,8 @@ export default function GoogleMapContainer() {
 
   const [mapRef, setMapRef] = useState(null);
   const [currLocation, setCurrLocation] = useState<Position>({
-    lat: 0,
-    lng: 0,
+    lat: 25.0216318419798,
+    lng:  121.54336352045829,
   });
 
   const onMapLoad = (map: any) => {
