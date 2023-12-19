@@ -216,6 +216,14 @@ export default function GoogleMapContainer() {
                     <p>Current Motor: {mapInfo[id].currMotor}</p>
                     <p>Max Space: {mapInfo[id].maxSpace}</p>
                     <Image folderPath={id} alt={`Parking Space ${id}`} />
+                    <Button
+                        key={`info-window-button-${id}`}
+                        className="h-4 w-12"
+                        text={"GO"}
+                        onClick={() => {
+                          handleMarkerButton(id);
+                        }}
+                      />
                   </div>
                 </InfoWindow>
               )}
