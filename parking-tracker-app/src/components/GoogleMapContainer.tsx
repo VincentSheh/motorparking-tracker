@@ -18,6 +18,7 @@ import Button from "./Button";
 import SearchInput from "./SearchInput";
 import Image from "@/app/admin/_components/Imageformap";
 
+
 interface Position {
   lat?: number | undefined;
   lng?: number | undefined;
@@ -236,113 +237,73 @@ export default function GoogleMapContainer() {
   }, [handleUserKeyPress]);
 
   return (
-    <div className="h-screen w-screen min-w-96 flex flex-row">
+    <div className="h-screen w-screen">
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
-        <>
-          <div className="h-full w-5/6 z-10">
-            <GoogleMap
-              mapContainerClassName="h-full"
-              center={currLocation}
-              zoom={15}
-              onLoad={onMapLoad}
-              fullscreenControl={false}
-              options={{
-                mapTypeControl: false,
-                fullscreenControl: false,
-                streetViewControl: false,
-              }}
-            >
-              <Marker
-                key="user-location"
-                position={currLocation}
-                icon={{
-                  url: "/motor.png",
-                  scaledSize: new google.maps.Size(60, 60),
-                }}
-                onClick={recenter}
-              />
-              {Object.keys(mapInfo).map((id) => (
-                <Marker
-                  key={id}
-                  position={mapInfo[id].position}
-                  icon={{
-                    url:
-                      mapInfo[id].currMotor < mapInfo[id].maxSpace
-                        ? "/available.png"
-                        : "/full.png",
-                    scaledSize:
-                      mapInfo[id].currMotor < mapInfo[id].maxSpace
-                        ? new google.maps.Size(60, 60)
-                        : new google.maps.Size(40, 40),
-                  }}
-                  onClick={() => toggleMarker(id)}
-                  label={{
-                    text: `Parking Space : ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`,
-                    style: markerStyle,
-                  }}
-                >
-                  {markerToggle[id] && (
-                    <InfoWindow
-                      key={`info-window-${id}`}
-                      position={mapInfo[id].position}
-                      onCloseClick={() => toggleMarker(id)}
-                    >
-                      <>
-                        <div style={{ width: '300px', height: '300px' }}>
-                          <p>ID: {id}</p>
-                          <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
-                          <p>Current Motor: {mapInfo[id].currMotor}</p>
-                          <p>Max Space: {mapInfo[id].maxSpace}</p>
-                          <Image folderPath={id} alt={`Parking Space ${id}`} />
-                        </div>
-                        <Button
-                          key={`info-window-button-${id}`}
-                          className="h-4 w-12"
-                          text={"GO"}
-                          onClick={() => {
-                            handleMarkerButton(id);
-                          }}
-                        />                      
-                      </>
-
-                    </InfoWindow>
-                  )}
-                </Marker>
-              ))}
-              {directionResponse && (
-                <DirectionsRenderer directions={directionResponse} />
-              )}
-            </GoogleMap>
-          </div>
-          <div className="h-full w-1/6 bg-blue-400 flex flex-col items-center z-20 pt-24 gap-y-4">
-            <div className="font-bold text-xl">UTILITY BUTTON</div>
-            <Button
-              className="h-12 w-28"
-              text={"RECENTER"}
-              onClick={recenter}
-            />
-            <Autocomplete>
+        <GoogleMap
+          mapContainerClassName="h-full"
+          center={currLocation}
+          zoom={15}
+          onLoad={onMapLoad}
+          fullscreenControl={false}
+        >
+                    <Autocomplete>
               <SearchInput
                 destinationRef={destinationRef}
                 onGoClick={calculateRoute}
               />
             </Autocomplete>
-            <Button className="h-12 w-28" text={"CLEAR"} onClick={clearRoute} />
-            {directionResponse && (
-              <div className="flex flex-col justify-center items-center gap-2 h-28 w-52 rounded-md bg-white">
-                <div className="font-bold text-xl text-center bg-blue-500 text-white rounded-lg py-1 px-3">{`Distance : ${distance}`}</div>
-                <div className="font-bold text-xl text-center bg-blue-500 text-white rounded-lg py-1 px-3">{`Duration : ${duration}`}</div>
-              </div>
+          <Marker
+            key="user-location"
+            position={currLocation}
+            icon={{
+              url: "/motor.png",
+              scaledSize: new google.maps.Size(60, 60),
+            }}
+            onClick={recenter}
+          />
+          {Object.keys(mapInfo).map((id) => (
+            <Marker
+              key={id}
+              position={mapInfo[id].position}
+              icon={{
+                url:
+                  mapInfo[id].currMotor < mapInfo[id].maxSpace
+                    ? "/available.png"
+                    : "/full.png",
+                scaledSize:
+                  mapInfo[id].currMotor < mapInfo[id].maxSpace
+                    ? new google.maps.Size(60, 60)
+                    : new google.maps.Size(40, 40),
+              }}
+              onClick={() => toggleMarker(id)}
+              label={{
+                text: `Parking Space : ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`,
+                style: markerStyle,
+              }}
+            >
+            {markerToggle[id] && (
+              <InfoWindow
+                key={`info-window-${id}`}
+                position={mapInfo[id].position}
+                onCloseClick={() => toggleMarker(id)}
+              >
+                <div style={{ width: '300px', height: '300px' }}>
+                  <p>ID: {id}</p>
+                  <p>Coordinates: {mapInfo[id].position.lat}, {mapInfo[id].position.lng}</p>
+                  <p>Current Motor: {mapInfo[id].currMotor}</p>
+                  <p>Max Space: {mapInfo[id].maxSpace}</p>
+                  <Image folderPath={id} alt={`Parking Space ${id}`} />
+                </div>
+              </InfoWindow>
             )}
-            <Button
-              className="h-18 w-40"
-              text={"GO TO NEAREST"}
-              onClick={goToNearest}
-            />
-          </div>
-        </>
+            </Marker>
+              ))}
+              {directionResponse && (
+                <DirectionsRenderer directions={directionResponse} />
+              )}
+            </GoogleMap>
       )}
     </div>
   );

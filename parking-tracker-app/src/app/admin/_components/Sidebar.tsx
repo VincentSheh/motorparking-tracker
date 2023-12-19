@@ -7,7 +7,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import AddParking from "./AddParking";
 import IllegalParkers from "./IllegalParkers";
 import ParkingList from "./ParkingList";
-import Image from "./Imageformap";
+import Image from "./image";
 import MenuIcon from "@mui/icons-material/Menu";
 
 const AdminSidebar = () => {
@@ -78,12 +78,12 @@ const AdminSidebar = () => {
         </div>
       </div>
 
-      <div className="flex-grow p-4">
+      <div className="flex-grow p-4 overflow-hidden">
         {selectedTab === "create" && <AddParking />}
         {selectedTab === "password" && <IllegalParkers />}
         {selectedTab === "parkings" && <ParkingList />}
         {selectedTab === "image" && (
-          <Image folderPath="images" alt="Latest Image" />
+          <Image folderPath="Illegal Parkings" alt="Latest Image"/>
         )}
       </div>
     </div>
