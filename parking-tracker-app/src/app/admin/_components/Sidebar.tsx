@@ -51,7 +51,7 @@ const AdminSidebar = () => {
               Add Parking Lot
             </Button>
           </div>
-          <div>
+          {/* <div>
             <Button
               startIcon={<SecurityIcon />}
               onClick={() => handleTabChange("password")}
@@ -66,13 +66,13 @@ const AdminSidebar = () => {
             >
               Parking Lists
             </Button>
-          </div>
+          </div> */}
           <div>
             <Button
-              startIcon={<ImageIcon />}
+              startIcon={<SecurityIcon />}
               onClick={() => handleTabChange("image")}
             >
-              Image
+              Illegaly Parked Motorbikes
             </Button>
           </div>
         </div>

@@ -40,12 +40,34 @@ export default function GoogleMapContainer() {
   const [directionResponse, setDirectionResponse] = useState(null);
 
   const destinationRef = useRef();
+  const userLoc = [25.01534580862057, 121.53059158213578]
+  // 25.01534580862057, 121.53059158213578
+  // 25.014761019203775, 121.53071023554331
+  // 25.014471768857863, 121.53109531387497
+  // 25.01389857350774, 121.53068388035796
+  // 25.01282647874315, 121.52928852043242
+  // 25.012360420177494, 121.52875708499637
+  // 25.012007887304907, 121.52841426503778
+  // 25.01186687387248, 121.52837779482938
+  // 25.01193517727403, 121.52855285182955
+  // 25.013343100217508, 121.53003111094182
+  // 25.013452209538436, 121.53027018166745
+  // 25.014077197385895, 121.53106867665343
+  //
+  //
+  //
+  // 25.014223342053366, 121.53149873371524
 
+  const viewLoc = [25.015460845030514, 121.53052014667183] 
   const [mapRef, setMapRef] = useState(null);
   const [currLocation, setCurrLocation] = useState<Position>({
-    lat: 25.0216318419798,
-    lng:  121.54336352045829,
+    lat: userLoc[0],
+    lng:  userLoc[1],
   });
+  const viewLocation:Position = {
+    lat: viewLoc[0],
+    lng: viewLoc[1]
+  }
 
   const onMapLoad = (map: any) => {
     setMapRef(map);
@@ -85,13 +107,13 @@ export default function GoogleMapContainer() {
   const handleUserKeyPress = useCallback(
     ({ key }: any) => {
       if (key === "r") {
-        if (directionResponse) {
-          calculateRoute();
-          return;
-        } else {
-          mapRef?.setZoom(15);
+        // if (directionResponse) {
+        //   calculateRoute();
+        //   return;
+        // } else {
+          mapRef?.setZoom(17);
           mapRef?.panTo(currLocation);
-        }
+        // }
       }
     },
     [currLocation, mapRef]
@@ -147,11 +169,11 @@ export default function GoogleMapContainer() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-        setCurrLocation({ lat: latitude, lng: longitude });
+        // setCurrLocation({ lat: latitude, lng: longitude });
       });
       const watcher = navigator.geolocation.watchPosition((position) => {
         const { latitude, longitude } = position.coords;
-        setCurrLocation({ lat: latitude, lng: longitude });
+        // setCurrLocation({ lat: latitude, lng: longitude });
       });
     }
   }, []);
@@ -185,25 +207,29 @@ export default function GoogleMapContainer() {
             onClick={recenter}
           />
           {Object.keys(mapInfo).map((id) => (
-            <Marker
-              key={id}
-              position={mapInfo[id].position}
-              icon={{
-                url:
-                  mapInfo[id].currMotor < mapInfo[id].maxSpace
-                    ? "/available.png"
-                    : "/full.png",
-                scaledSize:
-                  mapInfo[id].currMotor < mapInfo[id].maxSpace
-                    ? new google.maps.Size(20, 20)
-                    : new google.maps.Size(20, 20),
-              }}
-              onClick={() => toggleMarker(id)}
-              label={{
-                text: `Parking Space : ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`,
-                style: markerStyle,
-              }}
-            >
+              <Marker
+                key={id}
+                position={mapInfo[id].position}
+                icon={{
+                  url:
+                    mapInfo[id].currMotor < mapInfo[id].maxSpace
+                      ? "/available.png"
+                      : "/full.png",
+                  scaledSize:
+                    mapInfo[id].currMotor < mapInfo[id].maxSpace
+                      ? new google.maps.Size(30, 30)
+                      : new google.maps.Size(40, 40),
+                }}
+                onClick={() => toggleMarker(id)}
+                label={{
+                  text: mapInfo[id].currMotor < mapInfo[id].maxSpace 
+                        ? `Parking Space: ${mapInfo[id].currMotor}/${mapInfo[id].maxSpace}`
+                        : "Full",
+                  color: "black", // Example property
+                  fontSize: "12px", // Example property
+                  // Add other styling properties supported by MarkerLabel here
+                }}
+              >
               {markerToggle[id] && (
                 <InfoWindow
                   key={`info-window-${id}`}
