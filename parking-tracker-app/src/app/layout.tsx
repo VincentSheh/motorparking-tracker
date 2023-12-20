@@ -22,8 +22,8 @@ export default function RootLayout({
         <body className={inter.className}>
         <div className="sm:hidden md:block">
             <Header />
-            {children}
             </div>
+            {children}
         </body>
       </html>
     </ClerkProvider>
