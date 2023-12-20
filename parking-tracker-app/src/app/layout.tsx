@@ -20,7 +20,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-        <div className="sm:hidden md:block">
+        <div className="hidden sm:block md:hidden">
             <Header />
             </div>
             {children}
