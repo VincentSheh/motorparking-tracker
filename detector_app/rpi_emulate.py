@@ -108,7 +108,7 @@ class RPi_client():
 
       img = self.test_capture_img()
       self.post_img(img)
-      time.sleep(60)
+      time.sleep(30)
 
 
 def run_rpi_client(id, loc):
@@ -118,24 +118,20 @@ def run_rpi_client(id, loc):
 if __name__ == '__main__':
   #Simulate an RPi
   locations = [
-                # (25.042021191006476, 121.5234109484254), #男四
-                # (25.015017036477715, 121.53051299327274), #水源
-                # (25.013874166656965, 121.54123517602629), #台科大
+                (25.042021191006476, 121.5234109484254), #男四
+                (25.015017036477715, 121.53051299327274), #水源
+                (25.013874166656965, 121.54123517602629), #台科大
                 (25.026584635747103, 121.52723633223454), #師大
-                # (25.04194159732383, 121.50789932362468), #西門
+                (25.04194159732383, 121.50789932362468), #西門
                 ]  
   uuid_list = [
-          # "52c5f4c9-332c-4e11-8dcc-4b9b6a56224d",
-          # "59189b6c-54bf-4471-868b-a8aae1f3bb41",
-          # "3686144c-9698-4113-8d55-eefe726287e2",
+          "52c5f4c9-332c-4e11-8dcc-4b9b6a56224d",
+          "59189b6c-54bf-4471-868b-a8aae1f3bb41",
+          "3686144c-9698-4113-8d55-eefe726287e2",
           "72885325-dd5d-4024-821c-fabc064d754e",
-          # "d8e91f04-ff79-4a6b-bf30-bd209086cc3e",
+          "d8e91f04-ff79-4a6b-bf30-bd209086cc3e",
           ]
   parking_dir = []
-  # for i in range(len(uuid_list)):
-  
-  # for i in range(2):
-
   threads = []
   for i in range(5):
     thread = threading.Thread(target=run_rpi_client, args=(uuid_list[i], locations[i]))

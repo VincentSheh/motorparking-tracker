@@ -1,4 +1,4 @@
-export default function SearchInput({destinationRef, onGoClick}) {
+export default function SearchInput({destinationRef, onGoClick}:{destinationRef:any, onGoClick:any}) {
   return (
     <div className="flex items-center mx-2">
       <div className="flex border border-purple-200 rounded">

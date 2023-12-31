@@ -37,15 +37,15 @@ export default function GoogleMapContainer() {
   const router = useRouter();
 
   const { mapInfo, markerToggle, setMarkerToggle, setMapInfo } = useMap();
-  const [directionResponse, setDirectionResponse] = useState(null);
+  const [directionResponse, setDirectionResponse] = useState<any|null>(null);
 
-  const destinationRef = useRef();
+  const destinationRef = useRef<any>();
   const userLoc = [25.01534580862057, 121.53059158213578]
 
 
   const viewLoc = [25.015460845030514, 121.53052014667183] 
-  const [mapRef, setMapRef] = useState(null);
-  const [currLocation, setCurrLocation] = useState<Position>({
+  const [mapRef, setMapRef] = useState<google.maps.Map>();
+  const [currLocation, setCurrLocation] = useState<any>({
     lat: userLoc[0],
     lng:  userLoc[1],
   });
@@ -54,7 +54,7 @@ export default function GoogleMapContainer() {
     lng: viewLoc[1]
   }
 
-  const onMapLoad = (map: any) => {
+  const onMapLoad = (map: google.maps.Map) => {
     setMapRef(map);
   };
 
@@ -73,9 +73,10 @@ export default function GoogleMapContainer() {
   };
 
   const clearRoute = () => {
+    if (!mapRef) return
     setDirectionResponse(null);
     destinationRef.current.value = "";
-    mapRef?.setZoom(15);
+    mapRef.setZoom(15);
     mapRef?.panTo(currLocation);
   };
 
@@ -135,7 +136,11 @@ export default function GoogleMapContainer() {
         destination: new google.maps.LatLng(position.lat, position.lng),
         travelMode: google.maps.TravelMode.DRIVING,
       });
-      const distance = result.routes[0].legs[0].distance.value;
+      
+      const distance = result?.routes[0]?.legs[0]?.distance?.value;
+      if (distance === undefined) {
+        continue;
+      }      
       if (nearestDistance === null || distance < nearestDistance) {
         nearestDistance = distance;
         nearestResult = result;
@@ -180,7 +185,7 @@ export default function GoogleMapContainer() {
           center={currLocation}
           zoom={15}
           onLoad={onMapLoad}
-          fullscreenControl={false}
+          options={{fullscreenControl:false}}
         >
           <Marker
             key="user-location"

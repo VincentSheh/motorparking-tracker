@@ -46,13 +46,18 @@ class RPi_client():
     
   
   #Capture the image and perform preprocessing such as cropping
-  def rpi_capture_img(self):
-    with picamera.PiCamera() as camera:
-        camera.resolution = (320, 240) #TODO: Replace Resolution
-        camera.framerate = 24
-        image = np.empty((240 * 320 * 3,), dtype=np.uint8)
-        camera.capture(image, 'bgr')
-        img = image.reshape((240, 320, 3))
+  def rpi_capture_img(self, camera):
+    resolution = (1024,768)
+    x,y = resolution[0], resolution[1]
+    # with picamera.PiCamera() as camera:
+    camera.resolution = (x, y) #TODO: Replace Resolution
+    camera.framerate = 24
+    image = np.empty((y * x * 3,), dtype=np.uint8)
+    camera.start_preview()
+    time.sleep(3)
+    camera.capture(image, 'bgr')
+    camera.stop_preview()
+    img = image.reshape((y, x, 3))
     return img
         
   def test_capture_img(self, path='./sample_image.jpg'):
@@ -60,8 +65,9 @@ class RPi_client():
     return img
       
 
-  def post_img(self, img, api = 'http://192.168.50.115:3001/detect'):
-    
+  # def post_img(self, img, api = 'http://192.168.50.115:3001/detect'):
+  def post_img(self, img, api = 'http://140.112.18.202:3001/detect'):
+
     #Crop the Image
     # img = self.crop_img(img)
 
@@ -74,7 +80,11 @@ class RPi_client():
     headers = {}
     parking_data = dict()
     if self.state == 'Registering':
-      parking_data = {'state': self.state, 'uuid': self.uuid, 'latitude': self.axes['latitude'], 'longitude': self.axes['longitude'], 'curr_motor': self.curr_motor}
+      parking_data = {'state': self.state, 
+                      'uuid': self.uuid, 
+                      'latitude': self.axes['latitude'], 
+                      'longitude': self.axes['longitude'], 
+                      'curr_motor': self.curr_motor}
     if self.state == 'Connected':
       parking_data = {'state': self.state, 'uuid': self.uuid, 'curr_motor': self.curr_motor}
       
@@ -93,12 +103,14 @@ class RPi_client():
 
   
   def run(self):
-    #While True
-    self.curr_state = 'Registering'
-    
-    img = self.test_capture_img()
-    img = self.rpi_capture_img()
-    self.post_img(img)
+    with picamera.PiCamera() as camera:
+      
+      while True:
+        self.curr_state = 'Registering'
+        
+        img = self.rpi_capture_img(camera)
+        self.post_img(img)
+        time.sleep(5)
 
 if __name__ == '__main__':
   

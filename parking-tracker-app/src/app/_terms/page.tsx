@@ -12,7 +12,7 @@ export default function Terms(){
 
     </div>
     <Link href={"/maps"}> I agree </Link>
-    <Link href={"/terms/anotherterms"}>I don't </Link>
+    <Link href={"/terms/anotherterms"}>I dont </Link>
     </>
   )
 }
