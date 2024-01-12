@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getStorage, listAll, ref, getDownloadURL} from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '@/utils/firebase';
+import { default as Img } from 'next/image';
 
 interface LatestImageProps {
   folderPath: string;
@@ -59,7 +60,15 @@ const Image: React.FC<LatestImageProps> = ({ folderPath, alt }) => {
   
     return (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          {latestImageUrl && <img src={`${latestImageUrl}?${new Date().getTime()}`} alt={alt} style={{ width: '50%', height: 'auto' }} />}
+            {latestImageUrl && 
+                <Img 
+                    src={latestImageUrl} 
+                    alt={alt} 
+                    width={500} // You can specify the width
+                    height={300} // And the height
+                    layout='responsive' // This makes the image responsive
+                />
+            }
           </div>
     );
   };
